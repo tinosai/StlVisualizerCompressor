@@ -1,3 +1,4 @@
 stl_folder/
 code/
-
+.vscode/
+.DS_Store
