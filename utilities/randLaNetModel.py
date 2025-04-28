@@ -14,6 +14,15 @@ import torch
 import torch.nn as nn
 from scipy.spatial import cKDTree
 
+def make_norm(num_channels, norm_type='group', num_groups=8):
+    if norm_type == 'batch':
+        return nn.BatchNorm2d(num_channels, eps=1e-6, momentum=0.99)
+    elif norm_type == 'group':
+        return nn.GroupNorm(num_groups=num_groups, num_channels=num_channels)
+    else:
+        raise ValueError(f"Unsupported norm type: {norm_type}")
+
+
 def knn(pos_support, pos_query, k, mask_support=None, mask_query=None):
     """
     Performs k-nearest neighbors search between support and query points in batched 3D point clouds.
@@ -92,7 +101,9 @@ class SharedMLP(nn.Module):
             stride=stride,
             padding_mode=padding_mode
         )
-        self.batch_norm = nn.BatchNorm2d(out_channels, eps=1e-6, momentum=0.99) if bn else None
+        #self.batch_norm = nn.BatchNorm2d(out_channels, eps=1e-6, momentum=0.99) if bn else None
+        self.batch_norm = make_norm(out_channels, norm_type='group') if bn else None
+
         self.activation_fn = activation_fn
 
     def forward(self, input):
@@ -140,9 +151,12 @@ class LocalSpatialEncoding(nn.Module):
             valid_mask = mask.unsqueeze(1).unsqueeze(-1)  # (B, 1, N, 1)
 
             # Only mask distances, not coordinates
-            dist = dist.masked_fill(valid_mask.squeeze(1) == 0, float('inf'))
+            # dist = dist.masked_fill(valid_mask.squeeze(1) == 0, float('inf'))
+            dist = dist.masked_fill(~valid_mask.squeeze(1), 0.0)
 
-    
+            extended_coords = extended_coords * valid_mask
+            neighbors       = neighbors       * valid_mask
+
         concat = torch.cat((
             extended_coords,
             neighbors,
@@ -255,7 +269,8 @@ class RandLANetModel(nn.Module):
 
         self.fc_start = nn.Linear(d_in, 8)
         self.bn_start = nn.Sequential(
-            nn.BatchNorm2d(8, eps=1e-6, momentum=0.99),
+            #nn.BatchNorm2d(8, eps=1e-6, momentum=0.99),
+            make_norm(8, norm_type='group'),
             nn.LeakyReLU(0.2)
         )
 
@@ -286,7 +301,7 @@ class RandLANetModel(nn.Module):
         self.fc_end = nn.Sequential(
             SharedMLP(8, 64, bn=True, activation_fn=nn.ReLU()),
             SharedMLP(64, 32, bn=True, activation_fn=nn.ReLU()),
-            nn.Dropout(),
+            #nn.Dropout(),
             SharedMLP(32, d_out)
         )
         self.device = device

@@ -5,3 +5,5 @@ code/
 *.ipynb
 *.pyc
 utilities/__pycache__/
+data/
+models/

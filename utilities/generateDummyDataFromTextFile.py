@@ -22,7 +22,7 @@ def generate_dummy_data_from_text_file(file_path, output_dir) -> None:
     dummy_data = np.random.rand(data.shape[0]).tolist()
 
     # Create file content
-    file_content = "Data\n"
+    file_content = "# Data\n"
     file_content += "\n".join(map(str, dummy_data))
 
     # Create output directory if it doesn't exist

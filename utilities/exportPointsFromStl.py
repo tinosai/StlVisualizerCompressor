@@ -48,7 +48,7 @@ def export_points_from_stl(input_directory, output_directory):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Export points from STL files to TXT format.")
     parser.add_argument('--input_directory', type=str, required=True, help="Directory containing STL files.")
-    parser.add_argument('--output_directory', type=str, required=True, help="Directory to save the output CSV files.")
+    parser.add_argument('--output_directory', type=str, required=True, help="Directory to save the output TXT files.")
     args = parser.parse_args()
 
     export_points_from_stl(args.input_directory, args.output_directory)
