@@ -2,3 +2,6 @@ stl_folder/
 code/
 .vscode/
 .DS_Store
+*.ipynb
+*.pyc
+utilities/__pycache__/
