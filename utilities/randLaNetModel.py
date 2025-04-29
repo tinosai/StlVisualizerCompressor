@@ -334,7 +334,12 @@ class RandLANetModel(nn.Module):
         # <<<<<<<<<< ENCODER
         x_stack = []
 
-        permutation = torch.randperm(N)
+        #  permutation = torch.randperm(N)
+        if self.training:
+            permutation = torch.randperm(N, device=coords.device)
+        else:
+            permutation = torch.arange(N, device=coords.device)
+        
         coords = coords[:,permutation]
         mask = mask[:, permutation]
         x = x[:,:,permutation]
