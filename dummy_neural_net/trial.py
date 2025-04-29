@@ -143,9 +143,10 @@ model.eval()
 
 # 10. Test the model on a single point cloud
 with torch.no_grad():
-    test_points = np.loadtxt(os.path.join(current_path, "../data", "test", "dummy_file.txt"))  # shape (N, d_in)
+    test_points = np.loadtxt(os.path.join(current_path, "../data", "test", "dummy_file_2.txt"))  # shape (N, d_in)
 
     points_test = torch.tensor(test_points, dtype=torch.float32).to(device)
     mask_test = torch.ones(points_test.shape[0], dtype=torch.bool).to(device)
     pred_test = model(points_test.unsqueeze(0), mask_test.unsqueeze(0))
+    
     print(pred_test)

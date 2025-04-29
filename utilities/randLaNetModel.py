@@ -301,7 +301,7 @@ class RandLANetModel(nn.Module):
         self.fc_end = nn.Sequential(
             SharedMLP(8, 64, bn=True, activation_fn=nn.ReLU()),
             SharedMLP(64, 32, bn=True, activation_fn=nn.ReLU()),
-            #nn.Dropout(),
+            nn.Dropout(),
             SharedMLP(32, d_out)
         )
         self.device = device
